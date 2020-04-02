@@ -24,7 +24,7 @@
  |  limitations under the License.                                           |
  ----------------------------------------------------------------------------
 
- 29 February 2020
+ 2 April 2020
 
   Thanks to Ward DeBacker for enhancements to the client functionality
   Thanks to Sam Habiel for fix to emitter.off bug
@@ -314,6 +314,18 @@ let start = function(application, $, customAjaxFn, url) {
           delete messageObj.token;
           if (QEWD.log) console.log('sent: ' + JSON.stringify(messageObj));
         }
+      };
+
+      let replyPromise = function(messageObj) {
+        return new Promise((resolve) => {
+          QEWD.send(messageObj, function(responseObj) {
+            resolve(responseObj);
+          });
+        });
+      };
+
+      QEWD.reply = async function(message) {
+        return await replyPromise(message);
       };
 
       QEWD.getFragment = function(params, callback) {

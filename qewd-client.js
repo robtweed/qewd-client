@@ -24,7 +24,7 @@
  |  limitations under the License.                                           |
  ----------------------------------------------------------------------------
 
- 16 July 2020
+ 25 September 2020
 
   Thanks to Ward DeBacker for enhancements to the client functionality
   Thanks to Sam Habiel for fix to emitter.off bug

@@ -24,7 +24,7 @@
  |  limitations under the License.                                           |
  ----------------------------------------------------------------------------
 
- 2 April 2020
+ 16 July 2020
 
   Thanks to Ward DeBacker for enhancements to the client functionality
   Thanks to Sam Habiel for fix to emitter.off bug
@@ -94,6 +94,7 @@ let start = function(application, $, customAjaxFn, url) {
     let jwt_decode;
     let log = false;
     let io_path;
+    let use_fetch;
 
     if (typeof application === 'object') {
       $ = application.$;
@@ -105,8 +106,11 @@ let start = function(application, $, customAjaxFn, url) {
       jwt_decode = application.jwt_decode;
       log = application.log;
       io_path = application.io_path;
+      use_fetch = application.use_fetch;
       application = appName;
     }
+
+    if (use_fetch) io = null;
 
     function getCookie(name) {
       let value = "; " + document.cookie;
@@ -299,9 +303,41 @@ let start = function(application, $, customAjaxFn, url) {
         }
       }
 
+      async function send_fetch(message, callback) {
+        if (callback) {
+          registerEvent(message, callback);
+        }
+        if (token || message.type === 'ewd-register') {
+          message.token = token;
+        }
+        let fetch_url = (url ? url : '') + '/ajax';
+        let options = {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+          },
+          body: JSON.stringify(message)
+        };
+        let response = await fetch(fetch_url, options);
+        let json = {
+          type: message.type,
+          message: await response.json(),
+          finished: true
+        };
+        if (QEWD.log) console.log('json response: ' + JSON.stringify(json));
+
+        handleResponse(json);
+
+      }
+
       QEWD.send = function(messageObj, callback) {
+        if (QEWD.log) console.log('send: ' + JSON.stringify(messageObj));
         if (messageObj.ajax) {
           ajax(messageObj, callback);
+          return;
+        }
+        if (use_fetch) {
+          send_fetch(messageObj, callback);
           return;
         }
         if (callback) {
@@ -356,7 +392,7 @@ let start = function(application, $, customAjaxFn, url) {
         else {
           if (io_path) {
             if (QEWD.log) console.log('Setting custom socket.io path to ' + io_path);
-            socket = io({path: path + '/socket.io'});
+            socket = io({path: io_path + '/socket.io'});
           }
           else {
             socket = io.connect();
@@ -398,7 +434,7 @@ let start = function(application, $, customAjaxFn, url) {
 
       }
       else {
-        QEWD.send = ajax;
+        if (!use_fetch) QEWD.send = ajax;
         QEWD.send({
           type: 'ewd-register',
           application: application

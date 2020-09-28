@@ -85,9 +85,8 @@ let emitter = {
 let start = function(application, $, customAjaxFn, url) {
 
   let QEWD = this;
-  let _io;
 
-  function setup() {
+  function setup(io) {
     let cookieName = 'QEWDSession';
     let appName = application;
     let jwt = false;
@@ -110,7 +109,7 @@ let start = function(application, $, customAjaxFn, url) {
       application = appName;
     }
 
-    if (use_fetch) _io = null;
+    if (use_fetch) io = null;
 
     function getCookie(name) {
       let value = "; " + document.cookie;
@@ -377,7 +376,7 @@ let start = function(application, $, customAjaxFn, url) {
         }, callback);
       };
 
-      if (_io) {
+      if (io) {
         if (url) {
           let options = {
             transports: ['websocket'] // needed for react-native
@@ -387,15 +386,15 @@ let start = function(application, $, customAjaxFn, url) {
             options.path = io_path + '/socket.io';
           }
 
-          socket = _io(url, options);
+          socket = io(url, options);
         }
         else {
           if (io_path) {
             if (QEWD.log) console.log('Setting custom socket.io path to ' + io_path);
-            socket = _io({path: io_path + '/socket.io'});
+            socket = io({path: io_path + '/socket.io'});
           }
           else {
-            socket = _io.connect();
+            socket = io.connect();
           }
         }
 
@@ -450,15 +449,13 @@ let start = function(application, $, customAjaxFn, url) {
   }
 
   if (typeof application === 'object' && application.io) {
-    _io = application.io;
     // frameworks like Vue.js, React, ... import socket lib in their app structure & their own devserver
-    setup();
+    setup(application.io);
   }
   else {
     // self-contained version 
     loadJSFile('/socket.io/socket.io.js', function() {
-      _io = io;
-      setup();
+      setup(io);
       io = null;
     });
   }

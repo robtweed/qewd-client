@@ -454,7 +454,8 @@ let start = function(application, $, customAjaxFn, url) {
   }
   else {
     // self-contained version 
-    loadJSFile('/socket.io/socket.io.js', function() {
+    let io_path = (typeof application === 'object' && application.io_path) ? application.io_path : '';
+    loadJSFile(io_path + '/socket.io/socket.io.js', function() {
       setup(io);
       io = null;
     });

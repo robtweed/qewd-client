@@ -1,0 +1,36 @@
+{
+  "name": "qewd-client",
+  "version": "2.0.0",
+  "description": "ES6 Module version of QEWD Client",
+  "main": "qewd-client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robtweed/qewd-client.git"
+  },
+  "keywords": [
+    "qewd",
+    "qewd.js",
+    "qewdjs",
+    "qewd-up",
+    "qewdup",
+    "socket",
+    "io",
+    "websocket",
+    "xhr",
+    "ajax",
+    "jquery",
+    "fetch"
+  ],
+  "author": "Rob Tweed, M/Gateway Developments Ltd",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/robtweed/qewd-client/issues"
+  },
+  "homepage": "https://github.com/robtweed/qewd-client#readme",
+  "dependencies": {
+    "socket.io-client": "^2.3.0"
+  }
+}

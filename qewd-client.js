@@ -93,6 +93,7 @@ let start = function(application, $, customAjaxFn, url) {
     let jwt_decode;
     let log = false;
     let io_path;
+    let io_transports;
     let use_fetch;
 
     if (typeof application === 'object') {
@@ -105,6 +106,7 @@ let start = function(application, $, customAjaxFn, url) {
       jwt_decode = application.jwt_decode;
       log = application.log;
       io_path = application.io_path;
+      io_transports = application.io_transports;
       use_fetch = application.use_fetch;
       application = appName;
     }
@@ -379,7 +381,7 @@ let start = function(application, $, customAjaxFn, url) {
       if (io) {
         if (url) {
           let options = {
-            transports: ['websocket'] // needed for react-native
+            transports: io_transports || ['websocket'] // needed for react-native
           };
           if (io_path) {
             if (QEWD.log) console.log('Setting custom socket.io path to ' + io_path);

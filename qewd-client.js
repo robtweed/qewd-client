@@ -86,14 +86,14 @@ let start = function(application, $, customAjaxFn, url) {
 
   let QEWD = this;
 
-  loadJSFile('/socket.io/socket.io.js', function() {
-
+  function setup(io) {
     let cookieName = 'QEWDSession';
     let appName = application;
     let jwt = false;
     let jwt_decode;
     let log = false;
     let io_path;
+    let io_transports;
     let use_fetch;
 
     if (typeof application === 'object') {
@@ -106,6 +106,7 @@ let start = function(application, $, customAjaxFn, url) {
       jwt_decode = application.jwt_decode;
       log = application.log;
       io_path = application.io_path;
+      io_transports = application.io_transports;
       use_fetch = application.use_fetch;
       application = appName;
     }
@@ -380,7 +381,7 @@ let start = function(application, $, customAjaxFn, url) {
       if (io) {
         if (url) {
           let options = {
-            transports: ['websocket'] // needed for react-native
+            transports: io_transports || ['websocket'] // needed for react-native
           };
           if (io_path) {
             if (QEWD.log) console.log('Setting custom socket.io path to ' + io_path);
@@ -445,9 +446,22 @@ let start = function(application, $, customAjaxFn, url) {
 
     // render socket.io etc inaccessible from console!
     QEWD.start = function() {};
-    io = null;
+    //io = null;
     customAjaxFn = null;
-  });
+  }
+
+  if (typeof application === 'object' && application.io) {
+    // frameworks like Vue.js, React, ... import socket lib in their app structure & their own devserver
+    setup(application.io);
+  }
+  else {
+    // self-contained version 
+    let io_path = (typeof application === 'object' && application.io_path && location.pathname.startsWith(application.io_path)) ? application.io_path : '';
+    loadJSFile(io_path + '/socket.io/socket.io.js', function() {
+      setup(io);
+      io = null;
+    });
+  }
 }
 
 let ewd = function() {
